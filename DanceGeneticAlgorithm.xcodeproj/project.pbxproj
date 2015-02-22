@@ -7,7 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05F93D5E1A9822E100088D13 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05F93D5D1A9822E100088D13 /* main.cpp */; };
+		05F93D651A9822FA00088D13 /* DanceGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05F93D641A9822FA00088D13 /* DanceGraph.cpp */; };
+		05F93D721A98233F00088D13 /* EvolutionaryAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05F93D681A98233F00088D13 /* EvolutionaryAlgorithm.cpp */; };
+		05F93D741A98233F00088D13 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05F93D6C1A98233F00088D13 /* main.cpp */; };
+		05F93D751A98233F00088D13 /* Population.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05F93D6D1A98233F00088D13 /* Population.cpp */; };
+		05F93D7A1A9823DC00088D13 /* DanceMove.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05F93D781A9823DC00088D13 /* DanceMove.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +28,15 @@
 
 /* Begin PBXFileReference section */
 		05F93D5A1A9822E100088D13 /* DanceGeneticAlgorithm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DanceGeneticAlgorithm; sourceTree = BUILT_PRODUCTS_DIR; };
-		05F93D5D1A9822E100088D13 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		05F93D641A9822FA00088D13 /* DanceGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DanceGraph.cpp; sourceTree = "<group>"; };
+		05F93D681A98233F00088D13 /* EvolutionaryAlgorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EvolutionaryAlgorithm.cpp; sourceTree = "<group>"; };
+		05F93D691A98233F00088D13 /* EvolutionaryAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EvolutionaryAlgorithm.h; sourceTree = "<group>"; };
+		05F93D6C1A98233F00088D13 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		05F93D6D1A98233F00088D13 /* Population.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Population.cpp; sourceTree = "<group>"; };
+		05F93D6E1A98233F00088D13 /* Population.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Population.h; sourceTree = "<group>"; };
+		05F93D771A98239400088D13 /* DanceGraph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DanceGraph.h; sourceTree = "<group>"; };
+		05F93D781A9823DC00088D13 /* DanceMove.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DanceMove.cpp; sourceTree = "<group>"; };
+		05F93D791A9823DC00088D13 /* DanceMove.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DanceMove.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +53,15 @@
 		05F93D511A9822E100088D13 = {
 			isa = PBXGroup;
 			children = (
+				05F93D6C1A98233F00088D13 /* main.cpp */,
+				05F93D681A98233F00088D13 /* EvolutionaryAlgorithm.cpp */,
+				05F93D691A98233F00088D13 /* EvolutionaryAlgorithm.h */,
+				05F93D6D1A98233F00088D13 /* Population.cpp */,
+				05F93D6E1A98233F00088D13 /* Population.h */,
+				05F93D641A9822FA00088D13 /* DanceGraph.cpp */,
+				05F93D771A98239400088D13 /* DanceGraph.h */,
+				05F93D781A9823DC00088D13 /* DanceMove.cpp */,
+				05F93D791A9823DC00088D13 /* DanceMove.h */,
 				05F93D5C1A9822E100088D13 /* DanceGeneticAlgorithm */,
 				05F93D5B1A9822E100088D13 /* Products */,
 			);
@@ -57,7 +78,6 @@
 		05F93D5C1A9822E100088D13 /* DanceGeneticAlgorithm */ = {
 			isa = PBXGroup;
 			children = (
-				05F93D5D1A9822E100088D13 /* main.cpp */,
 			);
 			path = DanceGeneticAlgorithm;
 			sourceTree = "<group>";
@@ -118,7 +138,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				05F93D5E1A9822E100088D13 /* main.cpp in Sources */,
+				05F93D7A1A9823DC00088D13 /* DanceMove.cpp in Sources */,
+				05F93D751A98233F00088D13 /* Population.cpp in Sources */,
+				05F93D721A98233F00088D13 /* EvolutionaryAlgorithm.cpp in Sources */,
+				05F93D741A98233F00088D13 /* main.cpp in Sources */,
+				05F93D651A9822FA00088D13 /* DanceGraph.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
