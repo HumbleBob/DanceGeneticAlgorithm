@@ -17,6 +17,8 @@ int main(int argc, const char * argv[]) {
     
     DanceGraph* test = new DanceGraph(20, .1);
     
+    //This is test y'all!
+    
     //Make sure number of command line arguments is correct (print if not)
 
     if (argc < 9){
