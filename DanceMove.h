@@ -17,15 +17,29 @@ using namespace std;
 class DanceMove {
 public:
     //Constructor for creating a dance move: TODO: add levels, speed, emotion, etc.
-    DanceMove(int moveNum);
+    DanceMove(int moveNum, int elev[2], int spd, int limbs[5]);
     
     vector<DanceMove*> getLinks() { return links; }
     void setLinks(vector<DanceMove*> newLinks) { links = newLinks; }
     void addToLinks(DanceMove* newLink);
     
+    int getMoveNumber(){return moveNumber;};
+    int getStartElevation(){return elevation[0];};
+    int getEndElevation(){return elevation[1];};
+    int getSpeed(){return speed;};
+    int lLegUsed(){return limbsUsed[0];};
+    int rLegUsed(){return limbsUsed[1];};
+    int lArmUsed(){return limbsUsed[2];};
+    int rArmUsed(){return limbsUsed[3];};
+    int headUsed(){return limbsUsed[4];};
+
+    
 private:
     vector<DanceMove*> links;
     int moveNumber;
+    int elevation[2];
+    int speed;
+    int limbsUsed[5];
 };
 
 #endif /* defined(__DanceGeneticAlgorithm__DanceMove__) */

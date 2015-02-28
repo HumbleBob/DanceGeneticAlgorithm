@@ -19,6 +19,21 @@ using namespace std;
 
 const int K = 2;
 
+//The constant, 2D array for the elevation of a given dance move.
+const int elevation[20][2] = { {2,2},{2,1},{2,1},{1,2},{2,2},{2,2},{2,2},
+    {2,2},{2,0},{1,1},{1,2},{2,2},{2,0},{0,1},{0,0},{0,1},{2,2},{2,2},{2,2},
+    {2,1} };
+
+//The constant array for the speed of a given dance move.
+const int speed[20] = {1,1,1,0,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,};
+
+//The constant, 2D array for the body parts used for a given dance move.
+const int partsUsed[20][5] = { {0,0,1,1,1},{1,0,1,1,0},{0,0,0,1,1},
+    {0,0,0,0,1},{1,0,1,0,0},{0,0,1,1,0},{0,0,1,0,0},{0,1,1,0,0},
+    {0,1,1,1,0},{0,1,0,0,0},{1,1,1,1,1},{0,0,1,0,0},{0,1,1,1,0},
+    {0,0,1,1,0},{0,0,0,1,0},{0,0,1,1,1},{0,0,1,1,0},{0,1,1,1,1},
+    {0,1,1,1,0},{1,0,1,1,1} };
+
 class DanceGraph{
 public:
     //Constructors for creating a random graph
@@ -35,9 +50,11 @@ public:
     
     void printGraphConnections();
     void getSequence();
+        
+    void printMoves();
     
 private:
-    void initializeMoves(int numMoves);
+    void initializeMoves();
     void initializeConnections(int numMoves, double probConnect);
     unsigned long long calcCombinations(int numMoves);
     void createGraphWithLinks(int numMoves);
