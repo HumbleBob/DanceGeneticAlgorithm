@@ -16,7 +16,7 @@
 
 DanceGraph::DanceGraph(int numMoves, double makeLinkProb){
     //create a vector of dance moves
-    initializeMoves(numMoves);
+    initializeMoves();
     
     //initialize a vector of connections (undirected)
     initializeConnections(numMoves, makeLinkProb);
@@ -40,9 +40,14 @@ DanceGraph::DanceGraph(int numMoves) {
  *A method to initialize the moves
  */
 
-void DanceGraph::initializeMoves(int numMoves){
-    for (int i = 0; i < numMoves; i++){
-        moves.push_back(new DanceMove(i));
+void DanceGraph::initializeMoves(){
+    for (int i = 0; i < 20; i++){
+        int elev[2] = {elevation[i][0],elevation[i][1]};
+        int newSpeed = speed[i];
+        int bodyParts[5] = {partsUsed[i][0],partsUsed[i][1],partsUsed[i][2],
+            partsUsed[i][3],partsUsed[i][4]};
+        //add the moves to the vector of moves.
+        moves.push_back(new DanceMove(i,elev,newSpeed,bodyParts));
     }
 }
 
@@ -126,7 +131,92 @@ void DanceGraph::clearAllLinks(){
  */
 
 double DanceGraph::calcFitness(){
-    return 0;
+    
+    int sequenceScore = 0;
+    int moveCount[20];
+    
+    //First off, count the multiplicites of each dance move in the sequence.
+    for(int i = 0; i < moves.size(); i++){
+        for(int j = 0; j < moves.size(); j++){
+            if(moves.at(j)->getMoveNumber() == i){
+                moveCount[i]++;
+            }
+        }
+    }
+    
+    //Create a rule based on the repetition of a single move.
+    for(int i = 0; i < moves.size(); i++){
+        //Dock points if there is a move that is repeated more than 4 times.
+        if(moveCount[i] > 4){
+            sequenceScore = sequenceScore - 3;
+        }
+        else if(moveCount[i] == 4){
+            sequenceScore = sequenceScore - 1;
+        }
+        else if(moveCount[i] == 3 || moveCount[i] == 2){
+            sequenceScore = sequenceScore + 1;
+        }
+    }
+    
+    int abruptCount = 0;
+    
+    //Count number of "abrupt" Changes in the sequence.
+    for(int i = 0; i < moves.size() - 1; i++){
+        if(moves.at(i)->getEndElevation() - moves.at(i+1)->getStartElevation()
+           == 2 || moves.at(i)->getEndElevation() -
+           moves.at(i+1)->getStartElevation() == -2 || moves.at(i)->getSpeed() -
+           moves.at(i+1)->getSpeed() == -2){
+            abruptCount++;
+        }
+    }
+    
+    //Score the sequenceScore based on number of abrupt changes.
+    if(abruptCount > 3){
+        sequenceScore--;
+    }
+    else if(abruptCount == 3 || abruptCount == 2){
+        sequenceScore = sequenceScore + 2;
+    }
+    
+    //Dock points if the same move is repeated more than two times in a row.
+    for(int i = 0; i < moves.size() - 2; i++){
+        if(moves.at(i)->getMoveNumber() == moves.at(i+1)->getMoveNumber() &&
+           moves.at(i+1)->getMoveNumber() == moves.at(i+2)->getMoveNumber()){
+            sequenceScore = sequenceScore - 3;
+        }
+    }
+    
+    //Award points for an overall cycle.
+    if(moves.at(0)->getMoveNumber() == moves.at(moves.size()-1)->getMoveNumber()){
+        sequenceScore++;
+    }
+    
+    //Now we look at individual transitions between two moves:
+    for(int i = 0; i < moves.size() - 1; i++){
+        
+        //If the elevation of two sequential moves are of distance 2 away dock points.
+        if(moves.at(i)->getEndElevation() - moves.at(i+1)->getStartElevation()
+           == 2 || moves.at(i)->getEndElevation() - moves.at(i+1)->getStartElevation()
+           == -2){
+            sequenceScore--;
+        }
+        
+        //At least one body used part in common.
+        if((moves.at(i)->headUsed() == 1 && moves.at(i+1)->headUsed() == 1) ||
+           (moves.at(i)->rArmUsed() == 1 && moves.at(i+1)->rArmUsed() == 1) ||
+           (moves.at(i)->lArmUsed() == 1 && moves.at(i+1)->lArmUsed() == 1) ||
+           (moves.at(i)->rLegUsed() == 1 && moves.at(i+1)->rLegUsed() == 1) ||
+           (moves.at(i)->lLegUsed() == 1 && moves.at(i+1)->lLegUsed() == 1)){
+            sequenceScore++;
+        }
+        
+        //Similar speed to the previous move.
+        if(moves.at(i)->getSpeed() == moves.at(i+1)->getSpeed()){
+            sequenceScore++;
+        }
+    
+    }
+    return sequenceScore;
 }
 
 /**
@@ -210,4 +300,14 @@ vector<bool> DanceGraph::mutate(vector<bool> newConnections, double mutProb){
         }
     }
     return newConnections;
+}
+
+void DanceGraph::printMoves(){
+    
+    for(int i = 0; i < moves.size(); i++){
+        
+        cout << "Elevation: " << moves.at(i)->getStartElevation() << " to "
+        << moves.at(i)->getEndElevation() << endl;
+        
+    }
 }
