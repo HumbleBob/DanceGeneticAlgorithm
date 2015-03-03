@@ -34,27 +34,33 @@ const int partsUsed[20][5] = { {0,0,1,1,1},{1,0,1,1,0},{0,0,0,1,1},
     {0,0,1,1,0},{0,0,0,1,0},{0,0,1,1,1},{0,0,1,1,0},{0,1,1,1,1},
     {0,1,1,1,0},{1,0,1,1,1} };
 
+//constant for number of representative sequences generated for a graph
+const int numReps = 100;
+
 class DanceGraph{
 public:
     //Constructors for creating a random graph
     DanceGraph(int numMoves, double makeLinkProb);
     
     //Constructor for creating a graph given connections already exist
-    DanceGraph(int numMoves);
+    DanceGraph(int numMoves, vector<bool> newConnections);
     
-    double calcFitness();
+    double calcFitness(vector<DanceMove*> sequence);
+    double calcGraphFitness();
     void setFitness(double newFit) { fitness = newFit; }
     double getFitness() { return fitness; }
+    vector<bool> getConnections() { return connections; }
+    vector<DanceMove*> getMoves() { return moves; }
     
     DanceGraph* breed(DanceGraph graph, string cross, double crossProb, double mutProb);
     
     void printGraphConnections();
-    void getSequence();
+    vector<DanceMove*> getSequence();
         
     void printMoves();
     
 private:
-    void initializeMoves();
+    void initializeMoves(int numMoves);
     void initializeConnections(int numMoves, double probConnect);
     unsigned long long calcCombinations(int numMoves);
     void createGraphWithLinks(int numMoves);

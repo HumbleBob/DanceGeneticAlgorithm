@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include "Population.h"
 #include "DanceGraph.h"
 #include <cstdio>
@@ -32,25 +33,26 @@ public:
     EvolutionaryAlgorithm();
     
     //Initialize EvolutionaryAlgorithm object for Genetic
-    EvolutionaryAlgorithm(string name, int pop, string select, string cross, double probCross, double probMut, int maxGen, string alg, int printInt, int staleGen);
+    EvolutionaryAlgorithm(int numMoves, double probConnect, int pop, string select, string cross, double probCross, double probMut, int maxGen, string alg, int printInt, int staleGen);
     
     //Initialize EvolutionaryAlgorithm object for PBIL
-    EvolutionaryAlgorithm(string name, int pop, double pos, double neg, double probMut, double mutAmt, int maxGen, string alg, int printInt, int staleGen);
+    EvolutionaryAlgorithm(int numMoves, double probConnect, int pop, double pos, double neg, double probMut, double mutAmt, int maxGen, string alg, int printInt, int staleGen);
     
     //The body of the algorithm goes here
     void run();
     
 private:
-    void isSolved(DanceGraph best, clock_t start);
     void quitEvolving(int generationsRun, bool done, DanceGraph globalBest, clock_t start);
     
     //Updates to Probability Vector
     void updateTowardsBest(DanceGraph best);
     void updateAwayFromWorst(DanceGraph best, DanceGraph worst);
     void mutateProbVector();
+    void saveAdjacencyList(DanceGraph best);
     
     //Shared properties between Genetic and PBIL
-    string fileName;
+    int numMoves;
+    double probConnection;
     int populationSize;
     double probMutation;
     int maxGenerations;

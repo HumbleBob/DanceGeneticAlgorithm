@@ -21,7 +21,6 @@ using namespace std;
 const int M = 2;
 const int k = 1;
 const double e = exp(1.0);
-const double PROB = .25;
 
 //Sorts ascending by fitness (lowest to highest)
 static bool sortByFitness(DanceGraph firstGraph, DanceGraph secondGraph) { return firstGraph.getFitness() < secondGraph.getFitness(); }
@@ -29,8 +28,8 @@ static bool maxByFitness(DanceGraph firstGraph, DanceGraph secondGraph) { return
 
 class Population {
 public:
-    Population(int numGraphs);
-    Population(int numGraphs, vector<double> probVec);
+    Population(int numGraphs, int numMoves, double prob);
+    Population(int numGraphs, int numMoves, vector<double> probVec);
 
     void selection(string select);
     

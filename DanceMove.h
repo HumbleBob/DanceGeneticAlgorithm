@@ -10,6 +10,8 @@
 #define __DanceGeneticAlgorithm__DanceMove__
 
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -32,6 +34,8 @@ public:
     int lArmUsed(){return limbsUsed[2];};
     int rArmUsed(){return limbsUsed[3];};
     int headUsed(){return limbsUsed[4];};
+    
+    void printMoveNum() { cout << moveNumber+1; }
 
     
 private:

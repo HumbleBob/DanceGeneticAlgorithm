@@ -12,9 +12,9 @@
  *Constructor creating a new population of random graphs
  */
 
-Population::Population(int numGraphs) {
+Population::Population(int numGraphs, int numMoves, double prob) {
     for (int i = 0; i < numGraphs; i++){
-        DanceGraph* newGraph = new DanceGraph(numGraphs, PROB);
+        DanceGraph* newGraph = new DanceGraph(numMoves, prob);
         graphs.push_back(*newGraph);
     }
 }
@@ -23,7 +23,7 @@ Population::Population(int numGraphs) {
  *Alternate constructor for the PBIL problem
  */
 
-Population::Population(int numGraphs, vector<double> probVec){
+Population::Population(int numGraphs, int numMoves, vector<double> probVec){
     for (int i = 0; i < numGraphs; i++){
         DanceGraph newGraph = createGraphFromProbVec(probVec);
         graphs.push_back(newGraph);
@@ -128,7 +128,7 @@ void Population::boltzmannSelect(){
     breedingPool.clear();
     
     //Calculate sum of series for probability calculation later
-    double seriesSum;
+    double seriesSum = 0;
     for (int i = 0; i < graphs.size(); i++){
         seriesSum += pow(e, graphs[i].getFitness());
     }

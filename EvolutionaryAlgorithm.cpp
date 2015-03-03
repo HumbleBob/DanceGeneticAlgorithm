@@ -12,8 +12,9 @@
  *Constructor initializing a EvolutionaryAlgorithm object with Genetic properties.
  */
 
-EvolutionaryAlgorithm::EvolutionaryAlgorithm(string name, int pop, string select, string cross, double probCross, double probMut, int maxGen, string alg, int printInt, int staleGen) {
-    fileName = name;
+EvolutionaryAlgorithm::EvolutionaryAlgorithm(int numMoves, double probConnect, int pop, string select, string cross, double probCross, double probMut, int maxGen, string alg, int printInt, int staleGen) {
+    this->numMoves = numMoves;
+    probConnection = probConnect;
     populationSize = pop;
     selection = select;
     crossover = cross;
@@ -24,15 +25,16 @@ EvolutionaryAlgorithm::EvolutionaryAlgorithm(string name, int pop, string select
     printInterval = printInt;
     quitEvolve = staleGen;
     
-    population = new Population(populationSize);
+    population = new Population(populationSize, this->numMoves, probConnection);
 }
 
 /**
  *Constructor initializing a EvolutionaryAlgorithm object with PBIL properties.
  */
 
-EvolutionaryAlgorithm::EvolutionaryAlgorithm(string name, int pop, double pos, double neg, double probMut, double mutAmt, int maxGen, string alg, int printInt, int staleGen) {
-    fileName = name;
+EvolutionaryAlgorithm::EvolutionaryAlgorithm(int numMoves, double probConnect, int pop, double pos, double neg, double probMut, double mutAmt, int maxGen, string alg, int printInt, int staleGen) {
+    this->numMoves = numMoves;
+    probConnection = probConnect;
     populationSize = pop;
     posLearnRate = pos;
     negLearnRate = neg;
@@ -43,7 +45,7 @@ EvolutionaryAlgorithm::EvolutionaryAlgorithm(string name, int pop, double pos, d
     printInterval = printInt;
     quitEvolve = staleGen;
     
-    population = new Population(populationSize, probabilityVector);
+    population = new Population(populationSize, this->numMoves, probabilityVector);
 }
 
 /**
@@ -93,26 +95,10 @@ void EvolutionaryAlgorithm::run(){
         if (generation % printInterval == 0){
             cout << "o " << best.getFitness() << endl;
         }
-        isSolved(globalBest, start);
         generation++;
         genSinceBest++;
     }
     quitEvolving(genSinceBest, true, globalBest, start);
-}
-
-/**
- *This method checks to see if a given solution is optimal. If it is,
- *the evolution stops, and the solution is printed out.
- */
-
-void EvolutionaryAlgorithm::isSolved(DanceGraph best, clock_t start){
-    if (best.getFitness()){
-        cout << "c Generation's best solution = " << best.getFitness() << endl;
-        cout << "c Program terminated in x seconds" << endl;
-        cout << "c Program terminated in " << (clock() - start)/(double)CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "s PROBLEM SOLVED" << endl;
-        exit(1);
-    }
 }
 
 /**
@@ -123,13 +109,25 @@ void EvolutionaryAlgorithm::isSolved(DanceGraph best, clock_t start){
 void EvolutionaryAlgorithm::quitEvolving(int generationsRun, bool done, DanceGraph globalBest, clock_t start){
     if (quitEvolve <= generationsRun || done){
         if (done){
-            cout << "c Ran though all generations and didn't satisfy all clauses" << endl;
+            cout << "c Ran though all generations" << endl;
         }
         else {
             cout << "c Terminated program after " << generationsRun << " generations since best solution encountered" << endl;
         }
         cout << "c Best solution found = " << globalBest.getFitness() << endl;
         cout << "c Program terminated in " << (clock() - start)/(double)CLOCKS_PER_SEC << " seconds" << endl;
+        for (int i = 1; i < 5; i++){
+            vector<DanceMove*> sequence = globalBest.getSequence();
+            cout << "v Sequence " << i << ": ";
+            for (int j = 0; j < sequence.size(); j++){
+                sequence[j]->printMoveNum();
+                cout << ", ";
+            }
+            cout << "" << endl;
+            cout << "v Sequence " << i << " Fitness: " << globalBest.calcFitness(sequence) << endl;
+        }
+        
+        saveAdjacencyList(globalBest);
         exit(1);
     }
 }
@@ -173,6 +171,36 @@ void EvolutionaryAlgorithm::mutateProbVector(){
             probabilityVector[i] = probabilityVector[i]*(1.0-mutationAmount)+mutDirection*(mutationAmount);
         }
     }
+}
+
+/**
+ *Saves the adjacency list of the graph to a CSV file. This graph can later be
+ *visualized using Gephi.
+ */
+
+void EvolutionaryAlgorithm::saveAdjacencyList(DanceGraph best){
+    ofstream csvFile;
+    csvFile.open("/Users/sawyerbowman/Desktop/adjacencylist.csv");
+    
+    vector<bool> connections = best.getConnections();
+    vector<DanceMove*> moves = best.getMoves();
+    
+    //count keep track of individual links (ex numMoves for 1st dance move, numMoves-1 for 2nd dance move, etc)
+    int count = numMoves+1;
+    //moveNum represents the first dance move, offset represents the second dance move
+    int moveNum = 0;
+    for (int i = 0; i < connections.size(); i+=count){
+        count--;
+        for (int offset = moveNum; offset < count+moveNum; offset++){
+            //if there is a link at moveNum, offset, create representation in each dance move's links
+            if (connections[i+offset]){
+                csvFile << moveNum+1 << "," << offset << endl;
+            }
+        }
+        moveNum++;
+    }
+    
+    csvFile.close();
 }
 
 

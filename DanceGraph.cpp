@@ -16,7 +16,7 @@
 
 DanceGraph::DanceGraph(int numMoves, double makeLinkProb){
     //create a vector of dance moves
-    initializeMoves();
+    initializeMoves(numMoves);
     
     //initialize a vector of connections (undirected)
     initializeConnections(numMoves, makeLinkProb);
@@ -25,23 +25,26 @@ DanceGraph::DanceGraph(int numMoves, double makeLinkProb){
     createGraphWithLinks(numMoves);
     
     //set the fitness
-    fitness = calcFitness();
+    fitness = calcGraphFitness();
 }
 
 /**
  *Constructor to create a graph of moves with connections already set.
  */
 
-DanceGraph::DanceGraph(int numMoves) {
+DanceGraph::DanceGraph(int numMoves, vector<bool> newConnections) {
+    initializeMoves(numMoves);
+    connections = newConnections;
     createGraphWithLinks(numMoves);
+    fitness = calcGraphFitness();
 }
 
 /**
  *A method to initialize the moves
  */
 
-void DanceGraph::initializeMoves(){
-    for (int i = 0; i < 20; i++){
+void DanceGraph::initializeMoves(int numMoves){
+    for (int i = 0; i < numMoves; i++){
         int elev[2] = {elevation[i][0],elevation[i][1]};
         int newSpeed = speed[i];
         int bodyParts[5] = {partsUsed[i][0],partsUsed[i][1],partsUsed[i][2],
@@ -94,13 +97,14 @@ unsigned long long DanceGraph::calcCombinations(int numMoves){
 
 void DanceGraph::createGraphWithLinks(int numMoves){
     //clear links for each dance move
-    clearAllLinks();
+    //clearAllLinks();
     //count keep track of individual links (ex numMoves for 1st dance move, numMoves-1 for 2nd dance move, etc)
-    int count = numMoves;
+    int count = numMoves+1;
     //moveNum represents the first dance move, offset represents the second dance move
     int moveNum = 0;
     for (int i = 0; i < connections.size(); i+=count){
-        for (int offset = 0; offset < count; offset++){
+        count--;
+        for (int offset = moveNum; offset < count+moveNum; offset++){
             //if there is a link at moveNum, offset, create representation in each dance move's links
             if (connections[i+offset]){
                 moves[moveNum]->addToLinks(moves[offset]);
@@ -108,7 +112,6 @@ void DanceGraph::createGraphWithLinks(int numMoves){
             }
         }
         moveNum++;
-        count--;
     }
 }
 
@@ -130,22 +133,22 @@ void DanceGraph::clearAllLinks(){
  *is the fitness of the graph individual.
  */
 
-double DanceGraph::calcFitness(){
+double DanceGraph::calcFitness(vector<DanceMove*> sequence){
     
     int sequenceScore = 0;
     int moveCount[20];
     
     //First off, count the multiplicites of each dance move in the sequence.
-    for(int i = 0; i < moves.size(); i++){
-        for(int j = 0; j < moves.size(); j++){
-            if(moves.at(j)->getMoveNumber() == i){
+    for(int i = 0; i < sequence.size(); i++){
+        for(int j = 0; j < sequence.size(); j++){
+            if(sequence.at(j)->getMoveNumber() == i){
                 moveCount[i]++;
             }
         }
     }
     
     //Create a rule based on the repetition of a single move.
-    for(int i = 0; i < moves.size(); i++){
+    for(int i = 0; i < sequence.size(); i++){
         //Dock points if there is a move that is repeated more than 4 times.
         if(moveCount[i] > 4){
             sequenceScore = sequenceScore - 3;
@@ -161,11 +164,11 @@ double DanceGraph::calcFitness(){
     int abruptCount = 0;
     
     //Count number of "abrupt" Changes in the sequence.
-    for(int i = 0; i < moves.size() - 1; i++){
-        if(moves.at(i)->getEndElevation() - moves.at(i+1)->getStartElevation()
-           == 2 || moves.at(i)->getEndElevation() -
-           moves.at(i+1)->getStartElevation() == -2 || moves.at(i)->getSpeed() -
-           moves.at(i+1)->getSpeed() == -2){
+    for(int i = 0; i < sequence.size() - 1; i++){
+        if(sequence.at(i)->getEndElevation() - sequence.at(i+1)->getStartElevation()
+           == 2 || sequence.at(i)->getEndElevation() -
+           sequence.at(i+1)->getStartElevation() == -2 || sequence.at(i)->getSpeed() -
+           sequence.at(i+1)->getSpeed() == -2){
             abruptCount++;
         }
     }
@@ -179,39 +182,39 @@ double DanceGraph::calcFitness(){
     }
     
     //Dock points if the same move is repeated more than two times in a row.
-    for(int i = 0; i < moves.size() - 2; i++){
-        if(moves.at(i)->getMoveNumber() == moves.at(i+1)->getMoveNumber() &&
-           moves.at(i+1)->getMoveNumber() == moves.at(i+2)->getMoveNumber()){
+    for(int i = 0; i < sequence.size() - 2; i++){
+        if(sequence.at(i)->getMoveNumber() == sequence.at(i+1)->getMoveNumber() &&
+           sequence.at(i+1)->getMoveNumber() == sequence.at(i+2)->getMoveNumber()){
             sequenceScore = sequenceScore - 3;
         }
     }
     
     //Award points for an overall cycle.
-    if(moves.at(0)->getMoveNumber() == moves.at(moves.size()-1)->getMoveNumber()){
+    if(sequence.at(0)->getMoveNumber() == sequence.at(sequence.size()-1)->getMoveNumber()){
         sequenceScore++;
     }
     
-    //Now we look at individual transitions between two moves:
-    for(int i = 0; i < moves.size() - 1; i++){
+    //Now we look at individual transitions between two sequence:
+    for(int i = 0; i < sequence.size() - 1; i++){
         
-        //If the elevation of two sequential moves are of distance 2 away dock points.
-        if(moves.at(i)->getEndElevation() - moves.at(i+1)->getStartElevation()
-           == 2 || moves.at(i)->getEndElevation() - moves.at(i+1)->getStartElevation()
+        //If the elevation of two sequential sequence are of distance 2 away dock points.
+        if(sequence.at(i)->getEndElevation() - sequence.at(i+1)->getStartElevation()
+           == 2 || sequence.at(i)->getEndElevation() - sequence.at(i+1)->getStartElevation()
            == -2){
             sequenceScore--;
         }
         
         //At least one body used part in common.
-        if((moves.at(i)->headUsed() == 1 && moves.at(i+1)->headUsed() == 1) ||
-           (moves.at(i)->rArmUsed() == 1 && moves.at(i+1)->rArmUsed() == 1) ||
-           (moves.at(i)->lArmUsed() == 1 && moves.at(i+1)->lArmUsed() == 1) ||
-           (moves.at(i)->rLegUsed() == 1 && moves.at(i+1)->rLegUsed() == 1) ||
-           (moves.at(i)->lLegUsed() == 1 && moves.at(i+1)->lLegUsed() == 1)){
+        if((sequence.at(i)->headUsed() == 1 && sequence.at(i+1)->headUsed() == 1) ||
+           (sequence.at(i)->rArmUsed() == 1 && sequence.at(i+1)->rArmUsed() == 1) ||
+           (sequence.at(i)->lArmUsed() == 1 && sequence.at(i+1)->lArmUsed() == 1) ||
+           (sequence.at(i)->rLegUsed() == 1 && sequence.at(i+1)->rLegUsed() == 1) ||
+           (sequence.at(i)->lLegUsed() == 1 && sequence.at(i+1)->lLegUsed() == 1)){
             sequenceScore++;
         }
         
         //Similar speed to the previous move.
-        if(moves.at(i)->getSpeed() == moves.at(i+1)->getSpeed()){
+        if(sequence.at(i)->getSpeed() == sequence.at(i+1)->getSpeed()){
             sequenceScore++;
         }
     
@@ -241,7 +244,9 @@ DanceGraph* DanceGraph::breed(DanceGraph graph, string cross, double crossProb, 
     
     newConnections = mutate(newConnections, mutProb);
     
-    return new DanceGraph(20);
+    int numMoves = moves.size();
+    
+    return new DanceGraph(numMoves, newConnections);
 }
 
 /**
@@ -302,6 +307,10 @@ vector<bool> DanceGraph::mutate(vector<bool> newConnections, double mutProb){
     return newConnections;
 }
 
+/**
+ *
+ */
+
 void DanceGraph::printMoves(){
     
     for(int i = 0; i < moves.size(); i++){
@@ -311,3 +320,50 @@ void DanceGraph::printMoves(){
         
     }
 }
+
+/**
+ *Creates a new representative sequence by finding a random starting node,
+ *and then gets the following moves by randomly traversing the graph (each
+ *move has an equal probability of being selected).
+ */
+
+vector<DanceMove*> DanceGraph::getSequence(){
+    int randMove = rand() % moves.size();
+    vector<DanceMove*> repSequence;
+    
+    DanceMove* startMove = moves[randMove];
+    
+    //ensure the start node is not a singleton
+    while (startMove->getLinks().size() == 0){
+        randMove = rand() % moves.size();
+        startMove = moves[randMove];
+    }
+    
+    repSequence.push_back(startMove);
+    for (int i = 0; i < moves.size()-1; i++){
+        int newConnection = rand() % startMove->getLinks().size();
+        startMove = startMove->getLinks()[newConnection];
+        repSequence.push_back(startMove);
+    }
+    
+    return repSequence;
+}
+
+/**
+ *Calculates the fitness of graph by creating a constant number of representative
+ *sequences and calculating their individual fitnesses. The overall fitness is the
+ *average of the represetative sequence fitnesses.
+ */
+
+double DanceGraph::calcGraphFitness(){
+    double sum = 0;
+    for (int i = 0; i < numReps; i++){
+        vector<DanceMove*> newSequence = getSequence();
+        sum += calcFitness(newSequence);
+    }
+    return sum/numReps;
+}
+
+
+
+
