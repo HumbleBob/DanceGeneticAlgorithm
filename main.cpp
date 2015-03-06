@@ -12,6 +12,47 @@
 
 using namespace std;
 
+const int MOVES = 20;
+const double CONNECT[3] = {.05, .1, .15};
+const int INDIV = 100;
+const string SEL = "rs";
+const string C = "1c";
+const int PC = .7;
+const double PM[3] = {.001, .005, .01};
+const int GEN = 500;
+const string ALG = "g";
+
+/**
+ *Saves output into csv file
+ */
+
+void saveResults(int graphNum, double connect, double mut){
+    ofstream csvFile;
+    csvFile.open("/Users/sawyer/Desktop/dance_params.csv", std::ios_base::app);
+    
+    csvFile << graphNum << "," << connect << "," << mut << endl;
+    
+    csvFile.close();
+}
+
+/**
+ *Function to get test data
+ */
+
+void testing(){
+    int count = 1;
+    for (int connect = 0; connect < 3; connect++){
+        for (int mut = 0; mut < 3; mut++){
+            EvolutionaryAlgorithm ea = EvolutionaryAlgorithm(MOVES, CONNECT[connect],
+                                                             INDIV, SEL, C, PC,
+                                                             PM[mut], GEN, ALG, 1, GEN);
+            ea.run(count);
+            saveResults(count, CONNECT[connect], PM[mut]);
+            count++;
+        }
+    }
+}
+
 int main(int argc, const char * argv[]) {
     srand( time( NULL ) );
 
@@ -60,86 +101,88 @@ int main(int argc, const char * argv[]) {
     
     //If correct number of command line arguments, convert to proper type
     
-    else {
-        //These variables before the if statement represent shared values between Genetic and PBIL
-        int numMoves = stoi(argv[1]);
-        if (numMoves < 0 || numMoves > 20){
-            cout << "Please input a number of moves between 1 and 20" << endl;
-        }
-        double probConnection = stod(argv[2]);
-        string alg = argv[9];
-        int pop = stoi(argv[3]);
-        int maxGen = stoi(argv[8]);
-        int printInt = 1;
-        int staleGen = maxGen;
-        if (argc == 11 || argc == 12){
-            printInt = stoi(argv[10]);
-        }
-        if (argc == 12){
-            staleGen = stoi(argv[11]);
-        }
-        
-        //These variables represent different values between Genetic and PBIL
-        
-        string select = "";
-        string cross = "";
-        double pos = 0;
-        double neg = 0;
-        
-        double pCross = 0;
-        double pMut = 0;
-        double mutAmt = 0;
-        
-        /*
-         *Some parameters are not shared between Genetic and PBIL implementations
-         *so it is necessary to divide them up and create separate objects.
-         */
-        if (alg == "g"){
-            if (argv[4] == TS || argv[4] == RS || argv[4] == BS){
-                select = argv[4];
-            }
-            else {
-                cout << "Invalid second argument specifying selection type.  Please use:" << endl;
-                cout << "   ts  = tournament selection" << endl;
-                cout << "   rs   = rank based selection" << endl;
-                cout << "   bs   = Boltzmann selection" << endl;
-                exit(1);
-            }
-            if (argv[5] == ONE_C || argv[5] == UNIFORM){
-                cross = argv[5];
-            }
-            else {
-                cout << "Invalid fourth argument specifying crossover type.  Please use:" << endl;
-                cout << "   1c  = 1-point crossover" << endl;
-                cout << "   uc  = uniform crossover" << endl;
-                exit(1);
-            }
-            pCross = stod(argv[6]);
-            pMut = stod(argv[7]);
-            
-            //Create a Genetic object (with the appropriate parameters)
-            EvolutionaryAlgorithm ea = EvolutionaryAlgorithm(numMoves, probConnection, pop, select, cross, pCross, pMut, maxGen, alg, printInt, staleGen);
-            
-            //TODO:implement run method
-            ea.run();
-        }
-        else {
-            pos = stod(argv[4]);
-            neg = stod(argv[5]);
-            pMut = stod(argv[6]);
-            mutAmt = stod(argv[7]);
-            
-            //Create a PBIL object (with the appropriate parameters)
-            EvolutionaryAlgorithm ea = EvolutionaryAlgorithm(numMoves, probConnection, pop, pos, neg, pMut, mutAmt, maxGen, alg, printInt, staleGen);
-            
-            //TODO:implement run method
-            ea.run();
-            
-        }
-        
+    testing();
+    
+//    else {
+//        //These variables before the if statement represent shared values between Genetic and PBIL
+//        int numMoves = stoi(argv[1]);
+//        if (numMoves < 0 || numMoves > 20){
+//            cout << "Please input a number of moves between 1 and 20" << endl;
+//        }
+//        double probConnection = stod(argv[2]);
+//        string alg = argv[9];
+//        int pop = stoi(argv[3]);
+//        int maxGen = stoi(argv[8]);
+//        int printInt = 1;
+//        int staleGen = maxGen;
+//        if (argc == 11 || argc == 12){
+//            printInt = stoi(argv[10]);
+//        }
+//        if (argc == 12){
+//            staleGen = stoi(argv[11]);
+//        }
+//        
+//        //These variables represent different values between Genetic and PBIL
+//        
+//        string select = "";
+//        string cross = "";
+//        double pos = 0;
+//        double neg = 0;
+//        
+//        double pCross = 0;
+//        double pMut = 0;
+//        double mutAmt = 0;
+//        
+//        /*
+//         *Some parameters are not shared between Genetic and PBIL implementations
+//         *so it is necessary to divide them up and create separate objects.
+//         */
+//        if (alg == "g"){
+//            if (argv[4] == TS || argv[4] == RS || argv[4] == BS){
+//                select = argv[4];
+//            }
+//            else {
+//                cout << "Invalid second argument specifying selection type.  Please use:" << endl;
+//                cout << "   ts  = tournament selection" << endl;
+//                cout << "   rs   = rank based selection" << endl;
+//                cout << "   bs   = Boltzmann selection" << endl;
+//                exit(1);
+//            }
+//            if (argv[5] == ONE_C || argv[5] == UNIFORM){
+//                cross = argv[5];
+//            }
+//            else {
+//                cout << "Invalid fourth argument specifying crossover type.  Please use:" << endl;
+//                cout << "   1c  = 1-point crossover" << endl;
+//                cout << "   uc  = uniform crossover" << endl;
+//                exit(1);
+//            }
+//            pCross = stod(argv[6]);
+//            pMut = stod(argv[7]);
+//            
+//            //Create a Genetic object (with the appropriate parameters)
+//            EvolutionaryAlgorithm ea = EvolutionaryAlgorithm(numMoves, probConnection, pop, select, cross, pCross, pMut, maxGen, alg, printInt, staleGen);
+//            
+//            //TODO:implement run method
+//            ea.run();
+//        }
+//        else {
+//            pos = stod(argv[4]);
+//            neg = stod(argv[5]);
+//            pMut = stod(argv[6]);
+//            mutAmt = stod(argv[7]);
+//            
+//            //Create a PBIL object (with the appropriate parameters)
+//            EvolutionaryAlgorithm ea = EvolutionaryAlgorithm(numMoves, probConnection, pop, pos, neg, pMut, mutAmt, maxGen, alg, printInt, staleGen);
+//            
+//            //TODO:implement run method
+//            ea.run();
+//            
+//        }
+    
         cout << "done!" << endl;
         
-    }
+    //}
     
     return 0;
 }

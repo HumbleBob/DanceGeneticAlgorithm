@@ -36,6 +36,7 @@ public:
     int headUsed(){return limbsUsed[4];};
     
     void printMoveNum() { cout << moveNumber+1; }
+    int returnMoveNum() { return moveNumber+1; }
 
     
 private:

@@ -16,6 +16,7 @@
 #include "DanceGraph.h"
 #include <cstdio>
 #include <ctime>
+#include <sstream>
 
 using namespace std;
 
@@ -39,16 +40,17 @@ public:
     EvolutionaryAlgorithm(int numMoves, double probConnect, int pop, double pos, double neg, double probMut, double mutAmt, int maxGen, string alg, int printInt, int staleGen);
     
     //The body of the algorithm goes here
-    void run();
+    void run(int graphNum);
     
 private:
-    void quitEvolving(int generationsRun, bool done, DanceGraph globalBest, clock_t start);
+    void quitEvolving(int generationsRun, bool done, DanceGraph globalBest, clock_t start, int graphNum);
     
     //Updates to Probability Vector
     void updateTowardsBest(DanceGraph best);
     void updateAwayFromWorst(DanceGraph best, DanceGraph worst);
     void mutateProbVector();
-    void saveAdjacencyList(DanceGraph best);
+    void saveAdjacencyList(DanceGraph best, int graphNum);
+    void saveSequences(DanceGraph best, int graphNum);
     
     //Shared properties between Genetic and PBIL
     int numMoves;

@@ -55,7 +55,7 @@ EvolutionaryAlgorithm::EvolutionaryAlgorithm(int numMoves, double probConnect, i
  *is found.
  */
 
-void EvolutionaryAlgorithm::run(){
+void EvolutionaryAlgorithm::run(int graphNum){
     //start the clock
     clock_t start = clock();
     
@@ -66,7 +66,7 @@ void EvolutionaryAlgorithm::run(){
     int generation = 0;
     while (generation < maxGenerations){
         
-        quitEvolving(genSinceBest, false, globalBest, start);
+        quitEvolving(genSinceBest, false, globalBest, start, graphNum);
         
         //Run the Genetic Algorithm
         if (algorithm == "g"){
@@ -93,12 +93,12 @@ void EvolutionaryAlgorithm::run(){
         
         //Print out the best of the generation (with interval)
         if (generation % printInterval == 0){
-            cout << "o " << best.getFitness() << endl;
+            //cout << "o " << best.getFitness() << endl;
         }
         generation++;
         genSinceBest++;
     }
-    quitEvolving(genSinceBest, true, globalBest, start);
+    quitEvolving(genSinceBest, true, globalBest, start, graphNum);
 }
 
 /**
@@ -106,31 +106,56 @@ void EvolutionaryAlgorithm::run(){
  *been seen to terminate, then quit the program.
  */
 
-void EvolutionaryAlgorithm::quitEvolving(int generationsRun, bool done, DanceGraph globalBest, clock_t start){
+void EvolutionaryAlgorithm::quitEvolving(int generationsRun, bool done, DanceGraph globalBest, clock_t start, int graphNum){
     if (quitEvolve <= generationsRun || done){
         if (done){
-            cout << "c Ran though all generations" << endl;
+            //cout << "c Ran though all generations" << endl;
         }
         else {
-            cout << "c Terminated program after " << generationsRun << " generations since best solution encountered" << endl;
+            //cout << "c Terminated program after " << generationsRun << " generations since best solution encountered" << endl;
         }
         cout << "c Best solution found = " << globalBest.getFitness() << endl;
-        cout << "c Program terminated in " << (clock() - start)/(double)CLOCKS_PER_SEC << " seconds" << endl;
-        for (int i = 1; i < 5; i++){
-            vector<DanceMove*> sequence = globalBest.getSequence();
-            cout << "v Sequence " << i << ": ";
-            for (int j = 0; j < sequence.size(); j++){
-                sequence[j]->printMoveNum();
-                cout << ", ";
-            }
-            cout << "" << endl;
-            cout << "v Sequence " << i << " Fitness: " << globalBest.calcFitness(sequence) << endl;
-        }
+        //cout << "c Program terminated in " << (clock() - start)/(double)CLOCKS_PER_SEC << " seconds" << endl;
+//        for (int i = 1; i < 5; i++){
+//            vector<DanceMove*> sequence = globalBest.getSequence();
+//            cout << "v Sequence " << i << ": ";
+//            for (int j = 0; j < sequence.size(); j++){
+//                sequence[j]->printMoveNum();
+//                cout << ", ";
+//            }
+//            cout << "" << endl;
+//            cout << "v Sequence " << i << " Fitness: " << globalBest.calcFitness(sequence) << endl;
+//        }
+        saveSequences(globalBest, graphNum);
         
-        saveAdjacencyList(globalBest);
-        exit(1);
+        saveAdjacencyList(globalBest, graphNum);
+        //exit(1);
     }
 }
+
+/**
+ *Save sequences into separate file
+ */
+
+void EvolutionaryAlgorithm::saveSequences(DanceGraph best, int graphNum){
+    ofstream csvFile;
+    stringstream test;
+    test << "/Users/sawyer/Desktop/sequences.csv";
+    
+    csvFile.open(test.str(), std::ios_base::app);
+    
+    for (int i = 1; i < 5; i++){
+        vector<DanceMove*> sequence = best.getSequence();
+        csvFile << graphNum << "," << i << ",";
+        for (int j = 0; j < sequence.size(); j++){
+            csvFile << sequence[j]->returnMoveNum() << ",";
+        }
+        csvFile << best.calcFitness(sequence) << endl;
+    }
+    
+    csvFile.close();
+}
+
 
 /**
  *This method updates the probability vector towards the best candidate solution
@@ -178,9 +203,14 @@ void EvolutionaryAlgorithm::mutateProbVector(){
  *visualized using Gephi.
  */
 
-void EvolutionaryAlgorithm::saveAdjacencyList(DanceGraph best){
+void EvolutionaryAlgorithm::saveAdjacencyList(DanceGraph best, int graphNum){
     ofstream csvFile;
-    csvFile.open("/Users/sawyerbowman/Desktop/adjacencylist.csv");
+    
+    stringstream test;
+    
+    test << "/Users/sawyer/Desktop/adjacencylist" << graphNum << ".csv";
+    
+    csvFile.open(test.str());
     
     vector<bool> connections = best.getConnections();
     vector<DanceMove*> moves = best.getMoves();
